@@ -11,7 +11,14 @@ display_and_run go vet ./...
 # Test
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     # Make sure everything can compile since some package may not have tests
-    display_and_run go build ./...
+    # Note: that "go build ./..." will fail if some packages have only
+    #   tests (will get "no buildable Go source files" error) so we
+    #   have to do this the hard way.
+    go list -f '{{if (len .GoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor | \
+        while read pkg; do
+            display_and_run go build "$pkg"
+        done
+
     # Run tests with coverage report in each packages that has tests
     go list -f '{{if (len .TestGoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor > packages-with-tests || true
     if [[ -s packages-with-tests ]]; then
