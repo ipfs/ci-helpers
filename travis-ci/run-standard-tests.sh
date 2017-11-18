@@ -16,7 +16,9 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     #   have to do this the hard way.
     go list -f '{{if (len .GoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor | \
         while read pkg; do
-            display_and_run go build "$pkg"
+            (
+                cd "$(mktemp -d)" && display_and_run go build "$pkg"
+            )
         done
 
     # Run tests with coverage report in each packages that has tests
