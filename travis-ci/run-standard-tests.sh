@@ -6,7 +6,8 @@ display_and_run() {
 }
 
 # Vet
-display_and_run go vet ./...
+: "${GOVETCMD:=go vet}"
+display_and_run $GOVETCMD ./...
 
 # Test
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
