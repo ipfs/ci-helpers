@@ -5,9 +5,24 @@ display_and_run() {
   "$@"
 }
 
+# Fmt check
+GITDIR="$(pwd)"
+display_and_run cd "$(mktemp -d)"
+display_and_run git -c advice.detachedHead=false clone -q -s "$GITDIR" .
+echo "*** go fmt ./..." &&
+go fmt ./... > go-fmt.out &&
+if [[ -s go-fmt.out ]]; then
+    echo "ERROR: some files not gofmt'ed:"
+    cat go-fmt.out
+    exit 1
+fi
+display_and_run cd "$GITDIR"
+echo
+
 # Vet
 : "${GOVETCMD:=go vet}"
 display_and_run $GOVETCMD ./...
+echo
 
 # Test
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -21,7 +36,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
                 cd "$(mktemp -d)" && display_and_run go build "$pkg"
             )
         done
-
+    echo
     # Run tests with coverage report in each packages that has tests
     go list -f '{{if (len .TestGoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor > packages-with-tests || true
     if [[ -s packages-with-tests ]]; then
