@@ -1,7 +1,8 @@
+#!/bin/bash
 set -e
 
 display_and_run() {
-  echo "*** $@"
+  echo "***" "$@"
   "$@"
 }
 
@@ -30,7 +31,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     # Note: that "go build ./..." will fail if some packages have only
     #   tests (will get "no buildable Go source files" error) so we
     #   have to do this the hard way.
-    go list -f '{{if (len .GoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor | \
+    go list -f '{{if (len .GoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor/ | \
         while read pkg; do
             (
                 cd "$(mktemp -d)" && display_and_run go build "$pkg"
@@ -38,7 +39,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         done
     echo
     # Run tests with coverage report in each packages that has tests
-    go list -f '{{if (len .TestGoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor > packages-with-tests || true
+    go list -f '{{if (len .TestGoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor/ > packages-with-tests || true
     if [[ -s packages-with-tests ]]; then
         cat packages-with-tests | while read pkg; do
             profile="coverage.$(echo "$pkg" | md5sum | head -c 16).txt"
