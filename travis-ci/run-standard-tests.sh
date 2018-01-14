@@ -25,6 +25,25 @@ echo
 display_and_run $GOVETCMD ./...
 echo
 
+# Environment
+echo "*** Setting up test environment"
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    if [[ "$TRAVIS_SUDO" == true ]]; then
+        # Ensure that IPv6 is enabled.
+        # While this is unsupported by TravisCI, it still works for localhost.
+        sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=0
+        sudo sysctl -w net.ipv6.conf.default.disable_ipv6=0
+        sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
+    fi
+else
+    if [[ "$TRAVIS_SUDO" == true ]]; then
+        # OSX has a default file limit of 256, for some tests we need a
+        # maximum of 8192.
+        sudo launchctl limit maxfiles 8192 8192
+        ulimit -n 8192
+    fi
+fi
+
 # Test
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     # Make sure everything can compile since some package may not have tests
