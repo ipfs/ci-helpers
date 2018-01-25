@@ -36,12 +36,9 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
     fi
 else
-    if [[ "$TRAVIS_SUDO" == true ]]; then
-        # OSX has a default file limit of 256, for some tests we need a
-        # maximum of 8192.
-        sudo launchctl limit maxfiles 8192 8192
-        ulimit -n 8192
-    fi
+    # OSX has a default file limit of 256, for some tests we need a
+    # maximum of 8192.
+    ulimit -Sn 8192
 fi
 
 # Test
