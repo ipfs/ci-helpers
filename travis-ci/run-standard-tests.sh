@@ -55,7 +55,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         done
     echo
     # Run tests with coverage report in each packages that has tests
-    go list -f '{{if (len .TestGoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor/ > packages-with-tests || true
+    go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor/ > packages-with-tests || true
     if [[ -s packages-with-tests ]]; then
         cat packages-with-tests | while read pkg; do
             profile="coverage.$(echo "$pkg" | md5sum | head -c 16).txt"
