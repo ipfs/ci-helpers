@@ -47,10 +47,11 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     # Note: that "go build ./..." will fail if some packages have only
     #   tests (will get "no buildable Go source files" error) so we
     #   have to do this the hard way.
-    go list -f '{{if (len .GoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor/ | \
-        while read pkg; do
+    go list -f '{{if (len .GoFiles)}}{{.ImportPath}} {{if .Module}}{{.Module.Dir}}{{else}}{{.Dir}}{{end}}{{end}}' ./... | grep -v /vendor/ | \
+        while read pkg dir; do
             (
-                cd "$(mktemp -d)" && display_and_run go build "$pkg"
+              cd "$dir"
+              go build -o /dev/null "$pkg"
             )
         done
     echo
