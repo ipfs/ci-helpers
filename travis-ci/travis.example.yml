@@ -10,8 +10,8 @@ env:
   global:
     - GOTFLAGS="-race"
   matrix:
-    - GO111MODULE=on
-    - GXBUILD=on
+    - BUILD_DEPTYPE=gx
+    - BUILD_DEPTYPE=gomod
 
 
 # disable travis install
