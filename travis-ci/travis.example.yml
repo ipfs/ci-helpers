@@ -4,7 +4,7 @@ os:
 language: go
 
 go:
-    - 1.11.x
+  - 1.11.x
 
 env:
   global:
@@ -23,10 +23,10 @@ script:
 
 
 cache:
-    directories:
-        - $GOPATH/src/gx
-        - $GOPATH/pkg/mod
-        - /home/travis/.cache/go-build
+  directories:
+    - $GOPATH/src/gx
+    - $GOPATH/pkg/mod
+    - /home/travis/.cache/go-build
 
 notifications:
-email: false
+  email: false
