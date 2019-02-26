@@ -87,7 +87,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     if [[ -s packages-with-tests ]]; then
         while read -r pkg; do
             profile="coverage.$(echo "$pkg" | md5sum | head -c 16).txt"
-            display_and_run go test -v "${GOTFLAGS[@]}" -coverprofile="$profile" -covermode=atomic "$pkg"
+            display_and_run go test -v $GOTFLAGS -coverprofile="$profile" -covermode=atomic "$pkg"
         done < packages-with-tests
 
         # Doesn't count as a failure.
@@ -98,5 +98,5 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     fi
 else
     build_all
-    display_and_run go test -v "${GOTFLAGS[@]}" ./...
+    display_and_run go test -v $GOTFLAGS ./...
 fi
