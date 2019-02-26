@@ -40,6 +40,7 @@ if [[ $GXBUILD ]]; then
     display_and_run go get github.com/whyrusleeping/gx
     display_and_run go get github.com/whyrusleeping/gx-go
     export GO111MODULE=off
+	echo "*** Installing gx deps and rewriting"
     display_and_run gx install --nofancy
     display_and_run gx-go rw
 fi
@@ -79,7 +80,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 
         # Doesn't count as a failure.
         echo "*** Processing coverage report"
-        bash <(curl -s https://codecov.io/bash) || true
+        bash <(curl -s https://codecov.io/bash) || echo "Uploading to codecov failed"
     else
         echo "*** No tests!!!"
     fi
