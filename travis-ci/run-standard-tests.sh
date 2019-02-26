@@ -37,22 +37,22 @@ fi
 
 : "${BUILD_DEPTYPE:=gx}"
 case $BUILD_DEPTYPE in
-gx)
-    echo "*** Installing gx"
-    display_and_run go get github.com/whyrusleeping/gx
-    display_and_run go get github.com/whyrusleeping/gx-go
-    export GO111MODULE=off
-	echo "*** Installing gx deps and rewriting"
-    display_and_run gx install --nofancy
-    display_and_run gx-go rw
-    ;;
-gomod)
-    export GO111MODULE=on
-    ;;
-*)
-    echo "Unknown dependency build type: $BUILD_DEPTYPE"
-    exit 2
-    ;;
+    gx)
+        echo "*** Installing gx"
+        display_and_run go get github.com/whyrusleeping/gx
+        display_and_run go get github.com/whyrusleeping/gx-go
+        export GO111MODULE=off
+        echo "*** Installing gx deps and rewriting"
+        display_and_run gx install --nofancy
+        display_and_run gx-go rw
+        ;;
+    gomod)
+        export GO111MODULE=on
+        ;;
+    *)
+        echo "Unknown dependency build type: $BUILD_DEPTYPE"
+        exit 2
+        ;;
 esac
 
 
