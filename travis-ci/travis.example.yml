@@ -26,7 +26,6 @@ cache:
   directories:
     - $GOPATH/src/gx
     - $GOPATH/pkg/mod
-    - /home/travis/.cache/go-build
 
 notifications:
   email: false
