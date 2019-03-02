@@ -11,7 +11,7 @@ display_and_run git reset --hard
 
 # Fmt check
 echo "*** go fmt ./..."
-find . -name '*.go' -exec gofmt -l {} + > go-fmt.out
+find . -name '*.go' -not -path "./vendor/*" -exec gofmt -l {} + > go-fmt.out
 if [[ -s go-fmt.out ]]; then
 	echo "ERROR: some files not gofmt'ed:"
 	cat go-fmt.out
