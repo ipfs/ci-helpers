@@ -69,12 +69,15 @@ build_all() {
     #   have to do this the hard way.
     list_buildable | while read -r pkg dir; do
         echo '*** go build' "$pkg"
-        buildmode=archive
-        if [[ "$(go list -f '{{.Name}}')" == "main" ]]; then
-            # plugin works even when a "main" function is missing.
-            buildmode=plugin
-        fi
-        ( cd "$dir"; go build -buildmode=$buildmode -o /dev/null "$pkg")
+        (
+            cd "$dir"
+            buildmode=archive
+            if [[ "$(go list -f '{{.Name}}')" == "main" ]]; then
+                # plugin works even when a "main" function is missing.
+                buildmode=plugin
+            fi
+            go build -buildmode=$buildmode -o /dev/null "$pkg"
+        )
     done
 }
 
