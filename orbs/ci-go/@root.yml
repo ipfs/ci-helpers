@@ -13,7 +13,7 @@ environment: &environment
   GO111MODULE: "on"
   GOPATH: /go
   GOCACHE: /go-cache
-  PATH: /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/go/bin
+  PATH: /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/local/go/bin:/go/bin
   IPFS_DISTS: https://dist.ipfs.io
 
 executors:
