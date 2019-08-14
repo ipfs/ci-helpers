@@ -1,15 +1,10 @@
 description: "Save the go mod & build cache."
-parameters:
-  key:
-    description: "Cache key."
-    type: string
-    default: "go"
 steps:
   - save_cache:
-      key: v1-<< parameters.key >>-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
+      key: v1-gosrc-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
       paths:
-        - ~/go/pkg/mod
+        - /go/pkg/mod
   - save_cache:
-      key: v1-<< parameters.key >>-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
+      key: v1-gobin-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
       paths:
-        - ~/.cache/go-build/
+        - /go-cache
