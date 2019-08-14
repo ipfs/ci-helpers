@@ -1,0 +1,32 @@
+description: "Run go benchmarks against a branch."
+parameters:
+  output:
+    description: "File to write the results to."
+    type: string
+  branch:
+    description: "Branch to benchmark."
+    type: string
+    default: HEAD
+  cmd:
+    description: "Benchmark command."
+    type: string
+    default: go test -run=NONE -bench=. ./...
+steps:
+  - run:
+      name: Check out << parameters.branch >>
+      command: |
+        mkdir /tmp/benchmark
+        git --work-tree=/tmp/benchmark checkout << parameters.branch >> -- .
+  - run:
+      name: Benchmarking << parameters.branch >>
+      command: |
+        {
+        << parameters.cmd >>
+        } | tee << parameters.output >>
+      working_directory: /tmp/benchmark
+      environment:
+        IPFS_LOGGING: critical
+  - run:
+      when: always
+      name: Cleanup
+      command: rm -rf /tmp/benchmark

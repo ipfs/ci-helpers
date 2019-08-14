@@ -1,0 +1,10 @@
+description: "Run automatic lints against the repo."
+parameters:
+  package:
+    description: "Package to test."
+    type: string
+    default: "./..."
+steps:
+  - run:
+      name: Run goalngci-lint
+      command: golangci-lint run ./...

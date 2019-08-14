@@ -1,0 +1,19 @@
+description: "Restore the go mod & build cache."
+parameters:
+  key:
+    description: "Cache key."
+    type: string
+    default: "go"
+steps:
+  - restore_cache:
+      keys:
+        - v1-<< parameters.key >>-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
+        - v1-<< parameters.key >>-{{ .Branch }}-{{ checksum "go.sum" }}-
+        - v1-<< parameters.key >>-{{ .Branch }}-
+        - v1-<< parameters.key >>-master-
+  - restore_cache:
+      keys:
+        - v1-<< parameters.key >>-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
+        - v1-<< parameters.key >>-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-
+        - v1-<< parameters.key >>-{{ arch }}-{{ .Branch }}-
+        - v1-<< parameters.key >>-{{ arch }}-master-

@@ -1,0 +1,14 @@
+description: "Simple build and test example."
+usage:
+  version: 2.1
+  orbs:
+    ci-go: ipfs/ci-go@0.1
+  workflows:
+    test:
+      jobs:
+        - ci-go/build
+        - ci-go/test
+        - ci-go/lint
+        - benchmark:
+            requires:
+              - ci-go/test
