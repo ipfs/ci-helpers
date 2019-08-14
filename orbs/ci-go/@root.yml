@@ -6,10 +6,14 @@ description: |
 
   Orb Source - https://github.com/ipfs/ci-helpers/tree/master/orbs/ci-go
 
+# Don't rely on home, users, etc. We run multiple images that don't agree.
+# The one thing we _can_ agree on is that we have root.
 environment: &environment
   GIT_PAGER: cat
   GO111MODULE: "on"
-  GOPATH: /home/circleci/go
+  GOPATH: /go
+  GOCACHE: /go-cache
+  PATH: /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/go/bin
   IPFS_DISTS: https://dist.ipfs.io
 
 executors:

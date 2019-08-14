@@ -14,7 +14,6 @@ steps:
   - run:
       name: "go get golang.org/x/tools/cmd/benchcmp"
       command: |
-        export PATH="$(go env GOPATH)/bin:$PATH"
         which benchcmp >/dev/null 2>&1 || go get golang.org/x/tools/cmd/benchcmp@latest
       working_directory: /tmp
   - run:
@@ -23,7 +22,6 @@ steps:
         BEFORE: << parameters.before >>
         AFTER: << parameters.after >>
       command: |
-        export PATH="$(go env GOPATH)/bin:$PATH"
         parse() {
             sed -n \
                 -e 's/ *\t */\t/g' \
