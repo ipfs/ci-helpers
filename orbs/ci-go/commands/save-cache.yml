@@ -7,4 +7,4 @@ steps:
   - save_cache:
       key: v1-gobin-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
       paths:
-        - /go-cache
+        - /go/cache
