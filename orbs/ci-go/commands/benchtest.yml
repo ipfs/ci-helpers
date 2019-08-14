@@ -1,0 +1,37 @@
+description: "Run go benchmarks and fail on regressions."
+parameters:
+  tolerance:
+    description: "Tolerable slowdown (%)."
+    type: integer
+    default: 25
+  baseline:
+    description: "Baseline branch to which to compare (if any)."
+    type: string
+    default: ""
+  cmd:
+    description: "Benchmark command."
+    type: string
+    default: go test -run=NONE -bench=. ./...
+steps:
+  - benchmark:
+      cmd: << parameters.cmd >>
+      branch: master
+      output: /tmp/benchmark-before.txt
+  - benchmark:
+      cmd: << parameters.cmd >>
+      output: /tmp/benchmark-after.txt
+  - benchcmp:
+      before: /tmp/benchmark-before.txt
+      after: /tmp/benchmark-after.txt
+      tolerance: << parameters.tolerance >>
+  - when:
+      condition: << parameters.baseline >>
+      steps:
+        - benchmark:
+            cmd: << parameters.cmd >>
+            branch: << parameters.baseline >>
+            output: /tmp/benchmark-baseline.txt
+        - benchcmp:
+            before: /tmp/benchmark-baseline.txt
+            after: /tmp/benchmark-after.txt
+            tolerance: << parameters.tolerance >>

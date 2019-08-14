@@ -1,0 +1,116 @@
+version: 2.1
+
+description: |
+  IPFS is a distributed, content-addressed file system. The ipfs/ci-go Orb is
+  the shared CI logic used by our go repos.
+
+  Orb Source - https://github.com/ipfs/ci-helpers/tree/master/orbs/ci-go
+
+# Don't rely on home, users, etc. We run multiple images that don't agree.
+# The one thing we _can_ agree on is that we have root.
+environment: &environment
+  GIT_PAGER: cat
+  GO111MODULE: "on"
+  GOPATH: /go
+  GOCACHE: /go/cache
+  PATH: /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/local/go/bin:/go/bin
+  IPFS_DISTS: https://dist.ipfs.io
+
+executors:
+  default:
+    description: "The official CircleCI Go Docker image."
+    parameters:
+      tag:
+        description: "The `circleci/golang` Docker image version tag."
+        type: string
+        default: "1.12.7"
+    docker:
+      - image: circleci/golang:<< parameters.tag >>
+    environment:
+      <<: *environment
+  golangci:
+    description: "GolangCI Linter Image"
+    parameters:
+      tag:
+        description: "GolangCI Version"
+        type: string
+        default: "v1.17.1"
+    docker:
+      - image: golangci/golangci-lint:v1.17.1
+    environment:
+      <<: *environment
+
+jobs:
+  benchmark:
+    description: "Run go benchmarks and fail on regressions."
+    parameters:
+      tolerance:
+        description: "Tolerable slowdown (%)."
+        type: integer
+        default: 25
+      baseline:
+        description: "Baseline branch to which to compare (if any)."
+        type: string
+        default: ""
+      cmd:
+        description: "Benchmark command."
+        type: string
+        default: go test -run=NONE -bench=. ./...
+      executor:
+        description: "Configure the executor for this job"
+        type: executor
+        default: default
+    executor: << parameters.executor >>
+    environment:
+      <<: *environment
+    steps:
+      - checkout
+      - restore-cache
+      - benchtest:
+          baseline: << parameters.baseline >>
+          tolerance: << parameters.tolerance >>
+          cmd: << parameters.cmd >>
+      - save-cache
+  build:
+    description: "Build all packages in this repo."
+    parameters:
+      executor:
+        description: "Configure the executor for this job"
+        type: executor
+        default: default
+    executor: << parameters.executor >>
+    environment:
+      <<: *environment
+    steps:
+      - checkout
+      - restore-cache
+      - check-build
+      - save-cache
+  test:
+    description: "Run the unit tests on the repo"
+    parameters:
+      executor:
+        description: "Configure the executor for this job"
+        type: executor
+        default: default
+      race:
+        description: "Enable the race detector."
+        type: boolean
+        default: false
+    executor: << parameters.executor >>
+    environment:
+      <<: *environment
+    steps:
+      - checkout
+      - restore-cache
+      - test:
+          race: << parameters.race >>
+      - save-cache
+  lint:
+    description: "Run all linters on the repo"
+    executor: golangci
+    steps:
+      - checkout
+      - restore-cache
+      - lint
+      - save-cache

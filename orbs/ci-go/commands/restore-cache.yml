@@ -1,0 +1,14 @@
+description: "Restore the go mod & build cache."
+steps:
+  - restore_cache:
+      keys:
+        - v2-gosrc-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
+        - v2-gosrc-{{ .Branch }}-{{ checksum "go.sum" }}-
+        - v2-gosrc-{{ .Branch }}-
+        - v2-gosrc-master-
+  - restore_cache:
+      keys:
+        - v2-gobin-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
+        - v2-gobin-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-
+        - v2-gobin-{{ arch }}-{{ .Branch }}-
+        - v2-gobin-{{ arch }}-master-

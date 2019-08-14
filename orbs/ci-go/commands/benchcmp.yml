@@ -1,0 +1,47 @@
+description: "Compare two benchmark runs."
+parameters:
+  before:
+    description: "File containing the old benchmarks."
+    type: string
+  after:
+    description: "File containing the new benchmarks."
+    type: string
+  tolerance:
+    description: "Tolerable slowdown (%)."
+    type: integer
+    default: 25
+steps:
+  - run:
+      name: "go get golang.org/x/tools/cmd/benchcmp"
+      command: |
+        which benchcmp >/dev/null 2>&1 || go get golang.org/x/tools/cmd/benchcmp@latest
+      working_directory: /tmp
+  - run:
+      name: "Comparing benchmarks."
+      environment:
+        BEFORE: << parameters.before >>
+        AFTER: << parameters.after >>
+      command: |
+        parse() {
+            sed -n \
+                -e 's/ *\t */\t/g' \
+                -e '/^Benchmark/p' |
+                awk 'BEGIN{print "{\"results\": ["} {print "  {\"name\": \"",$1,"\", \"time\": ",$3," },"} END{print "]}"}' OFS="" ORS=" "|
+                sed -e 's/, ]/ ]/g' |
+                jq '.results[] | {name: .name, time: .time }'
+        }
+        benchcmp "$BEFORE" "$AFTER"
+        DIR="$(mktemp -d /tmp/bench.XXXXXX)"
+        parse < "$BEFORE" > "$DIR/before.json"
+        parse < "$AFTER" > "$DIR/after.json"
+        set +e # We now care about the exit status.
+        echo ""
+        echo "Result:"
+        cat "$DIR/before.json" "$DIR/after.json" | jq -e -r -s 'group_by(.name)[] | {name: .[0].name, speedup: (.[0].time / .[1].time)} | select(.speedup < (100 - << parameters.tolerance >>)/100) | "\(.name)\t\(.speedup)x"'
+        if [[ $? -ne 4 ]]; then
+            echo ""
+            echo "FAIL"
+            exit 1
+        else
+            echo "PASS"
+        fi

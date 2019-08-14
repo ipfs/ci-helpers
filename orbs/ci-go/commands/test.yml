@@ -1,0 +1,45 @@
+description: "Run go the unit tests with the requested parallelism."
+parameters:
+  package:
+    description: "Package to test."
+    type: string
+    default: "./..."
+  flags:
+    description: "Go test flags."
+    type: string
+    default: ""
+  race:
+    description: "Enable the race detector."
+    type: boolean
+    default: false
+  coverage:
+    description: "Enable coverage collection."
+    type: boolean
+    default: true
+steps:
+  - run:
+      name: "Make test results directory."
+      command: |
+        mkdir -p /tmp/test-results/${CIRCLE_JOB}
+  - run:
+      name: "Run go unit tests."
+      command: |
+        gotestsum \
+          --junitfile "$(mktemp /tmp/test-results/${CIRCLE_JOB}/go-test.${CIRCLE_NODE_ID}.XXXXXX.xml)" \
+          -- -v << parameters.flags >> \
+          <<# parameters.race >> -race <</parameters.race >> \
+          <<# parameters.coverage >> \
+          -coverprofile="/tmp/gotest.coverprofile" \
+          -covermode=atomic \
+          <</ parameters.coverage >> \
+          $(go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}{{.ImportPath}}{{end}}' ./... | grep -v /vendor/ || true | circleci tests split --split-by=timings)
+  - store_test_results:
+      when: always
+      path: /tmp/test-results
+  - when:
+      condition: << parameters.coverage >>
+      steps:
+        - run:
+            name: "Uploading coverage."
+            command: |
+              bash <(curl -s https://codecov.io/bash) -cF unittests -X search -f /tmp/gotest.coverprofile

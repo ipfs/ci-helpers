@@ -1,0 +1,23 @@
+description: "Check that the project is buildable."
+parameters:
+  package:
+    description: "Package to check."
+    type: string
+    default: "./..."
+steps:
+  - run:
+      name: "check build"
+      command: |
+        go list -f '{{if (len .GoFiles)}}{{.ImportPath}} {{if .Module}}{{.Module.Dir}}{{else}}{{.Dir}}{{end}}{{end}}' << parameters.package >> | grep -v /vendor/ |
+          while read -r pkg dir; do
+          echo '*** go build' "$pkg"
+          (
+            cd "$dir"
+            buildmode=archive
+            if [[ "$(go list -f '{{.Name}}')" == "main" ]]; then
+              # plugin works even when a "main" function is missing.
+              buildmode=plugin
+            fi
+            go build -buildmode=$buildmode -o /dev/null "$pkg"
+          )
+        done
