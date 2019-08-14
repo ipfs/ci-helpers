@@ -1,0 +1,43 @@
+description: "Check that the project is buildable on supported platforms."
+parameters:
+  package:
+    description: "Package to check."
+    type: string
+    default: "./..."
+steps:
+  - check-build:
+      os: linux
+      arch: "386"
+  - check-build:
+      os: linux
+      arch: "amd64"
+  - check-build:
+      os: linux
+      arch: "arm64"
+  - check-build:
+      os: linux
+      arch: "arm"
+  - check-build:
+      os: darwin
+      arch: "amd64"
+  - check-build:
+      os: darwin
+      arch: "386"
+  - check-build:
+      os: windows
+      arch: "386"
+  - check-build:
+      os: windows
+      arch: "amd64"
+  - check-build:
+      os: freebsd
+      arch: "386"
+  - check-build:
+      os: freebsd
+      arch: "amd64"
+  - check-build:
+      os: openbsd
+      arch: "386"
+  - check-build:
+      os: openbsd
+      arch: "amd64"

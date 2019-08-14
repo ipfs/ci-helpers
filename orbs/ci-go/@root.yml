@@ -89,7 +89,7 @@ jobs:
     steps:
       - checkout
       - restore-cache
-      - check-build
+      - check-build-supported
       - save-cache
   test:
     description: "Run the unit tests on the repo"
