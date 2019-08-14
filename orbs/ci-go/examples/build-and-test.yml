@@ -9,6 +9,7 @@ usage:
         - ci-go/build
         - ci-go/test
         - ci-go/lint
+        - ci-go/test-macos
         - benchmark:
             requires:
               - ci-go/test

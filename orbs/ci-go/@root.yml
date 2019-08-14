@@ -111,7 +111,7 @@ jobs:
       - test:
           race: << parameters.race >>
       - save-cache
-  test/macos:
+  test-macos:
     description: "Run the unit tests on MacOS"
     executor: macos
     steps:
