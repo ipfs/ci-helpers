@@ -1,5 +1,11 @@
 version: 2.1
 
+description: |
+  IPFS is a distributed, content-addressed file system. The ipfs/ci-go Orb is
+  the shared CI logic used by our go repos.
+
+  Orb Source - https://github.com/ipfs/ci-helpers/tree/master/orbs/ci-go
+
 environment: &environment
   GIT_PAGER: cat
   GO111MODULE: "on"
