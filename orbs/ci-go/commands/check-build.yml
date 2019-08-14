@@ -4,9 +4,33 @@ parameters:
     description: "Package to check."
     type: string
     default: "./..."
+  os:
+    description: "Operating System"
+    type: enum
+    enum:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+      - openbsd
+      - js
+      - android
+      - netbsd
+  arch:
+    description: "Architecture"
+    type: enum
+    enum:
+      - "386"
+      - amd64
+      - arm
+      - arm64
+      - wasm
 steps:
   - run:
-      name: "check build"
+      name: "Checking build on << parameters.os >>/<< parameters.arch >>"
+      environment:
+        GOOS: << parameters.os >>
+        GOARCH: << parameters.arch >>
       command: |
         go list -f '{{if (len .GoFiles)}}{{.ImportPath}} {{if .Module}}{{.Module.Dir}}{{else}}{{.Dir}}{{end}}{{end}}' << parameters.package >> | grep -v /vendor/ |
           while read -r pkg dir; do
