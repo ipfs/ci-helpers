@@ -33,7 +33,7 @@ steps:
         benchcmp "$BEFORE" "$AFTER"
         DIR="$(mktemp -d /tmp/bench.XXXXXX)"
         parse < "$BEFORE" > "$DIR/before.json"
-        parse < "$AFTER > "$DIR/after.json"
+        parse < "$AFTER" > "$DIR/after.json"
         set +e # We now care about the exit status.
         echo ""
         echo "Result:"
