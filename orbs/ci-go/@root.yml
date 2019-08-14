@@ -28,6 +28,11 @@ executors:
       - image: circleci/golang:<< parameters.tag >>
     environment:
       <<: *environment
+  macos:
+    macos:
+      xcode: "10.0.0"
+    environment:
+      <<: *environment
   golangci:
     description: "GolangCI Linter Image"
     parameters:
@@ -105,6 +110,15 @@ jobs:
       - restore-cache
       - test:
           race: << parameters.race >>
+      - save-cache
+  test/macos:
+    description: "Run the unit tests on MacOS"
+    executor: macos
+    steps:
+      - setup-macos
+      - checkout
+      - restore-cache
+      - test
       - save-cache
   lint:
     description: "Run all linters on the repo"
