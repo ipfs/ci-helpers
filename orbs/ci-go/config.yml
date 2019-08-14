@@ -31,6 +31,87 @@ executors:
       <<: *environment
 
 commands:
+  benchcmp:
+    parameters:
+      before:
+        description: "File containing the old benchmarks."
+        type: string
+      after:
+        description: "File containing the new benchmarks."
+        type: string
+      tolerance:
+        description: "Tolerable slowdown (%)."
+        type: integer
+        default: 25
+    steps:
+      - run:
+          name: "go get golang.org/x/tools/cmd/benchcmp"
+          command: |
+            export PATH="$(go env GOPATH)/bin:$PATH"
+            which benchcmp >/dev/null 2>&1 || go get golang.org/x/tools/cmd/benchcmp@latest
+          working_directory: /tmp
+      - run:
+          name: "Comparing benchmarks."
+          environment:
+            BEFORE: << parameters.before >>
+            AFTER: << parameters.after >>
+          command: |
+            export PATH="$(go env GOPATH)/bin:$PATH"
+            parse() {
+                sed -n \
+                    -e 's/ *\t */\t/g' \
+                    -e '/^Benchmark/p' |
+                    awk 'BEGIN{print "{\"results\": ["} {print "  {\"name\": \"",$1,"\", \"time\": ",$3," },"} END{print "]}"}' OFS="" ORS=" "|
+                    sed -e 's/, ]/ ]/g' |
+                    jq '.results[] | {name: .name, time: .time }'
+            }
+            benchcmp "$BEFORE" "$AFTER"
+            DIR="$(mktemp -d /tmp/bench.XXXXXX)"
+            parse < "$BEFORE" > "$DIR/before.json"
+            parse < "$AFTER > "$DIR/after.json"
+            set +e # We now care about the exit status.
+            echo ""
+            echo "Result:"
+            cat "$DIR/before.json" "$DIR/after.json" | jq -e -r -s 'group_by(.name)[] | {name: .[0].name, speedup: (.[0].time / .[1].time)} | select(.speedup < (100 - << parameters.tolerance >>)/100) | "\(.name)\t\(.speedup)x"'
+            if [[ $? -ne 4 ]]; then
+                echo ""
+                echo "FAIL"
+                exit 1
+            else
+                echo "PASS"
+            fi
+  benchmark:
+    parameters:
+      output:
+        description: "File to write the results to."
+        type: string
+      branch:
+        description: "Branch to benchmark."
+        type: string
+        default: HEAD
+      cmd:
+        description: "Benchmark command."
+        type: string
+        default: go test -run=NONE -bench=. ./...
+    steps:
+      - run:
+          name: Check out << parameters.branch >>
+          command: |
+            mkdir /tmp/benchmark
+            git --work-tree=/tmp/benchmark checkout << parameters.branch >> -- .
+      - run:
+          name: Benchmarking << parameters.branch >>
+          command: |
+            {
+            << parameters.cmd >>
+            } | tee << parameters.output >>
+          working_directory: /tmp/benchmark
+          environment:
+            IPFS_LOGGING: critical
+      - run:
+          when: always
+          name: Cleanup
+          command: rm -rf /tmp/benchmark
   save-cache:
     description: "Save the go mod & build cache."
     parameters:
@@ -192,6 +273,47 @@ jobs:
       - test:
           race: << parameters.race >>
       - save-cache
+  benchmark:
+    parameters:
+      tolerance:
+        description: "Tolerable slowdown (%)."
+        type: integer
+        default: 25
+      baseline:
+        description: "Baseline branch to which to compare (if any)."
+        type: string
+        default: ""
+      cmd:
+        description: "Benchmark command."
+        type: string
+        default: go test -run=NONE -bench=. ./...
+    executor: default
+    steps:
+      - checkout
+      - restore-cache
+      - benchmark:
+          cmd: << parameters.cmd >>
+          branch: master
+          output: /tmp/benchmark-before.txt
+      - benchmark:
+          cmd: << parameters.cmd >>
+          output: /tmp/benchmark-after.txt
+      - benchcmp:
+          before: /tmp/benchmark-before.txt
+          after: /tmp/benchmark-after.txt
+          tolerance: << parameters.tolerance >>
+      - when:
+          condition: << parameters.baseline >>
+          steps:
+            - benchmark:
+                cmd: << parameters.cmd >>
+                branch: << parameters.baseline >>
+                output: /tmp/benchmark-baseline.txt
+            - benchcmp:
+                before: /tmp/benchmark-baseline.txt
+                after: /tmp/benchmark-after.txt
+                tolerance: << parameters.tolerance >>
+      - save-cache
 
 examples:
   build-and-test:
@@ -206,3 +328,6 @@ examples:
             - ci-go/build
             - ci-go/test
             - ci-go/lint
+            - benchmark:
+                requires:
+                  - ci-go/test
