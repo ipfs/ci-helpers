@@ -25,6 +25,7 @@ steps:
       name: "Run go unit tests."
       command: |
         gotestsum \
+          --format short-verbose \
           --junitfile "$(mktemp /tmp/test-results/${CIRCLE_JOB}/go-test.${CIRCLE_NODE_ID}.XXXXXX.xml)" \
           -- -v << parameters.flags >> \
           <<# parameters.race >> -race <</parameters.race >> \
