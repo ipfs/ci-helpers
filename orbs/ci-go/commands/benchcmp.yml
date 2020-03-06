@@ -12,9 +12,9 @@ parameters:
     default: 25
 steps:
   - run:
-      name: "go get golang.org/x/tools/cmd/benchcmp"
+      name: "go get golang.org/x/tools/cmd/benchstat"
       command: |
-        which benchcmp >/dev/null 2>&1 || go get golang.org/x/tools/cmd/benchcmp@latest
+        which benchstat >/dev/null 2>&1 || go get golang.org/x/tools/cmd/benchstat@latest
       working_directory: /tmp
   - run:
       name: "Comparing benchmarks."
@@ -30,7 +30,7 @@ steps:
                 sed -e 's/, ]/ ]/g' |
                 jq '.results[] | {name: .name, time: .time }'
         }
-        benchcmp "$BEFORE" "$AFTER"
+        benchstat "$BEFORE" "$AFTER"
         DIR="$(mktemp -d /tmp/bench.XXXXXX)"
         parse < "$BEFORE" > "$DIR/before.json"
         parse < "$AFTER" > "$DIR/after.json"
