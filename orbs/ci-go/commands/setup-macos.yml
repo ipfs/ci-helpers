@@ -1,7 +1,7 @@
 parameters:
   version:
     type: string
-    default: 1.13.4
+    default: "1.14.0"
   testsum-version:
     type: string
     default: v0.3.5
