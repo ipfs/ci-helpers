@@ -12,9 +12,9 @@ parameters:
     default: 25
 steps:
   - run:
-      name: "go get golang.org/x/tools/cmd/benchstat"
+      name: "go get golang.org/x/perf/cmd/benchstat"
       command: |
-        which benchstat >/dev/null 2>&1 || go get golang.org/x/tools/cmd/benchstat@latest
+        which benchstat >/dev/null 2>&1 || go get golang.org/x/perf/cmd/benchstat@latest
       working_directory: /tmp
   - run:
       name: "Comparing benchmarks."
