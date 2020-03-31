@@ -23,7 +23,7 @@ executors:
       tag:
         description: "The `circleci/golang` Docker image version tag."
         type: string
-        default: "1.14.0"
+        default: "1.14.1"
     docker:
       - image: cimg/go:<< parameters.tag >>
     environment:
