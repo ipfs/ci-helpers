@@ -26,7 +26,7 @@ steps:
       command: |
         gotestsum \
           --format short-verbose \
-          --junitfile "$(mktemp /tmp/test-results/${CIRCLE_JOB}/go-test.${CIRCLE_NODE_ID}.XXXXXX.xml)" \
+          --junitfile "$(mktemp /tmp/test-results/${CIRCLE_JOB}/go-test.${CIRCLE_NODE_INDEX}.XXXXXX.xml)" \
           -- -v << parameters.flags >> \
           <<# parameters.race >> -race <</parameters.race >> \
           <<# parameters.coverage >> \
