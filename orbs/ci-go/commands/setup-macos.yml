@@ -36,7 +36,7 @@ steps:
   - restore_cache:
       name: "Restoring Tools"
       keys:
-        - v1-gotools-{{ arch }}-testsum@<< parameters.testsum-version >>:go@<< parameters.version >>
+        - v2-gotools-{{ arch }}-testsum@<< parameters.testsum-version >>:go@<< parameters.version >>
   - run:
       name: "Installing Tools"
       command: |
@@ -45,6 +45,6 @@ steps:
         sudo rm -rf /home/circleci/go/cache /home/circleci/go/pkg /home/circleci/go/src
   - save_cache:
       name: "Caching Tools"
-      key: v1-gotools-{{ arch }}-testsum@<< parameters.testsum-version >>:go@<< parameters.version >>
+      key: v2-gotools-{{ arch }}-testsum@<< parameters.testsum-version >>:go@<< parameters.version >>
       paths:
         /home/circleci/go/bin
