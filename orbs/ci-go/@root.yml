@@ -25,7 +25,7 @@ executors:
         type: string
         default: "1.14.0"
     docker:
-      - image: circleci/golang:<< parameters.tag >>
+      - image: cimg/go:<< parameters.tag >>
     environment:
       <<: *environment
   macos:
