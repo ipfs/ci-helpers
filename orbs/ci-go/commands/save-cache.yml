@@ -4,9 +4,9 @@ steps:
       name: "Saving Source Cache"
       key: v2-gosrc-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
       paths:
-        - /go/pkg/mod
+        - /home/circleci/go/pkg/mod
   - save_cache:
       name: "Saving Build Cache"
       key: v2-gobin-{{ arch }}-{{ .Branch }}-{{ checksum "go.sum" }}-{{ .Environment.CIRCLE_JOB }}
       paths:
-        - /go/cache
+        - /home/circleci/go/cache

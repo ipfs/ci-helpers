@@ -9,8 +9,8 @@ steps:
   - run:
       name: "Making the go workspace"
       command: |
-        sudo mkdir /go
-        sudo chmod 1777 /go
+        sudo mkdir -p /home/circleci/go
+        sudo chmod 1777 /home/circleci/go
   - restore_cache:
       name: "Restoring Go Compiler"
       keys:
@@ -42,9 +42,9 @@ steps:
       command: |
         which gotestsum >/dev/null 2>&1 || go get gotest.tools/gotestsum@v0.3.5
         # Finally, clean out the gopath so we don't sully the cache.
-        sudo rm -rf /go/cache /go/pkg /go/src
+        sudo rm -rf /home/circleci/go/cache /home/circleci/go/pkg /home/circleci/go/src
   - save_cache:
       name: "Caching Tools"
       key: v1-gotools-{{ arch }}-testsum@<< parameters.testsum-version >>:go@<< parameters.version >>
       paths:
-        /go/bin
+        /home/circleci/go/bin

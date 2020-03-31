@@ -11,8 +11,8 @@ description: |
 environment: &environment
   GIT_PAGER: cat
   GO111MODULE: "on"
-  GOPATH: /go
-  GOCACHE: /go/cache
+  GOPATH: /home/circleci/go
+  GOCACHE: /home/circleci/go/cache
   PATH: /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/local/go/bin:/go/bin
   IPFS_DISTS: https://dist.ipfs.io
 
